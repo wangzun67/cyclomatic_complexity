@@ -35,20 +35,19 @@ class Util:
 
     def _traverse(self, cursor):
         cyclomatic_complexity = 1
-        from_parent = False
         while True:
-            if not from_parent:
-                if cursor.goto_first_child():
-                    if cursor.node.type in CONTROL_NODE_TYPES:
-                        cyclomatic_complexity += 1
-                    continue
+            if cursor.goto_first_child():
+                if cursor.node.type in CONTROL_NODE_TYPES:
+                    cyclomatic_complexity += 1
+                continue
             if cursor.goto_next_sibling():
-                from_parent = False
                 if cursor.node.type in CONTROL_NODE_TYPES:
                     cyclomatic_complexity += 1
                 continue
             if cursor.goto_parent():
-                from_parent = True
+                while not cursor.goto_next_sibling():
+                    if not cursor.goto_parent():
+                        return cyclomatic_complexity
                 continue
             break
         return cyclomatic_complexity
